@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ventas del Mes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .colaborador {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .totales {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .exportar {
+      margin-top: 30px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    .acciones-finales {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      gap: 20px;
+    }
+    .acciones-finales button:nth-child(1) {
+      background-color: #f1c40f;
+    }
+    .acciones-finales button:nth-child(2) {
+      background-color: #e74c3c;
+    }
+    #graficaVentas {
+    max-width: 500px;
+    max-height: 400px;
+    margin: 0 auto;
+    display: block;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h1 id="titulo"></h1>
+
+  <div class="container">
+    <div class="colaborador">
+      <h3>Raúl</h3>
+      <input type="number" id="venta1" placeholder="Venta con IVA">
+      <input type="text" id="folio1" placeholder="Folio de sonic">
+      <button onclick="registrarVenta('colaborador1')">Enviar</button>
+      <div class="totales">Total acumulado: $<span id="total1">0.00</span></div>
+    </div>
+
+    <div class="colaborador">
+      <h3>Ixchel</h3>
+      <input type="number" id="venta2" placeholder="Venta con IVA">
+      <input type="text" id="folio2" placeholder="Folio de sonic">
+      <button onclick="registrarVenta('colaborador2')">Enviar</button>
+      <div class="totales">Total acumulado: $<span id="total2">0.00</span></div>
+    </div>
+  </div>
+
+  <div class="exportar">
+    <button onclick="exportarExcel()">Exportar a Excel</button>
+  </div>
+
+  <table id="tablaVentas">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Raúl</th>
+        <th>Folio</th>
+        <th>Fecha</th>
+        <th>Ixchel</th>
+        <th>Folio</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="acciones-finales">
+    <button onclick="deshacerUltimo()">Deshacer último registro</button>
+    <button onclick="reiniciarTodo()">Reiniciar todo</button>
+  </div>
+
+  <div style="margin-top: 40px;">
+    <h3 style="text-align: center;">Progreso hacia la meta ($93,000)</h3>
+    <canvas id="graficaVentas"></canvas>
+  </div>
+
+  <script>
+    const titulo = document.getElementById('titulo');
+    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+                   "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const fecha = new Date();
+    titulo.textContent = `Ventas del mes ${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+
+    let historial = JSON.parse(localStorage.getItem('historialVentas')) || {
+      colaborador1: [],
+      colaborador2: []
+    };
+    let ultimaVenta = null;
+    let grafica;
+
+    function registrarVenta(colaborador) {
+      const ventaInput = document.getElementById(colaborador === 'colaborador1' ? 'venta1' : 'venta2');
+      const folioInput = document.getElementById(colaborador === 'colaborador1' ? 'folio1' : 'folio2');
+
+      const ventaConIVA = parseFloat(ventaInput.value) || 0;
+      const ventaSinIVA = ventaConIVA / 1.16;
+      const folio = folioInput.value.trim() || "-";
+      const fechaActual = new Date().toISOString().split('T')[0];
+
+      historial[colaborador].push({
+        fecha: fechaActual,
+        monto: ventaSinIVA,
+        folio: folio
+      });
+
+      ultimaVenta = { colaborador };
+
+      localStorage.setItem('historialVentas', JSON.stringify(historial));
+
+      ventaInput.value = '';
+      folioInput.value = '';
+
+      actualizarTotales();
+      actualizarTabla();
+    }
+
+    function actualizarTotales() {
+      const total1 = historial.colaborador1.reduce((sum, v) => sum + v.monto, 0);
+      const total2 = historial.colaborador2.reduce((sum, v) => sum + v.monto, 0);
+
+      document.getElementById('total1').textContent = total1.toFixed(2);
+      document.getElementById('total2').textContent = total2.toFixed(2);
+
+      actualizarGrafica();
+    }
+
+    function actualizarTabla() {
+      const tbody = document.querySelector("#tablaVentas tbody");
+      tbody.innerHTML = "";
+
+      const ventas1 = historial.colaborador1;
+      const ventas2 = historial.colaborador2;
+      const maxLength = Math.max(ventas1.length, ventas2.length);
+
+      for (let i = 0; i < maxLength; i++) {
+        const v1 = ventas1[i];
+        const v2 = ventas2[i];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${v1 ? v1.fecha : ''}</td>
+          <td>${v1 ? `$${v1.monto.toFixed(2)}` : ''}</td>
+          <td>${v1 ? v1.folio : ''}</td>
+          <td>${v2 ? v2.fecha : ''}</td>
+          <td>${v2 ? `$${v2.monto.toFixed(2)}` : ''}</td>
+          <td>${v2 ? v2.folio : ''}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    function actualizarGrafica() {
+      const total1 = historial.colaborador1.reduce((sum, v) => sum + v.monto, 0);
+      const total2 = historial.colaborador2.reduce((sum, v) => sum + v.monto, 0);
+      const totalGeneral = total1 + total2;
+      const meta = 93000;
+      const restante = Math.max(meta - totalGeneral, 0);
+
+      const labels = restante > 0 ? ['Raúl', 'Ixchel', 'Restante'] : ['Raúl', 'Ixchel'];
+      const data = restante > 0 ? [total1, total2, restante] : [total1, total2];
+      const colores = restante > 0 ? ['#3498db', '#e67e22', '#bdc3c7'] : ['#3498db', '#e67e22'];
+
+      const ctx = document.getElementById('graficaVentas').getContext('2d');
+
+      if (grafica) {
+        grafica.data.labels = labels;
+        grafica.data.datasets[0].data = data;
+        grafica.data.datasets[0].backgroundColor = colores;
+        grafica.update();
+      } else {
+        grafica = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: colores
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const raw = context.raw;
+                    const porcentaje = (raw / meta * 100).toFixed(2);
+                    return `${context.label}: $${raw.toFixed(2)} (${porcentaje}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function deshacerUltimo() {
+      if (!ultimaVenta) {
+        alert("No hay acción para deshacer.");
+        return;
+      }
+
+      const { colaborador } = ultimaVenta;
+      if (historial[colaborador].length > 0) {
+        historial[colaborador].pop();
+        ultimaVenta = null;
+        localStorage.setItem('historialVentas', JSON.stringify(historial));
+        actualizarTotales();
+        actualizarTabla();
+      }
+    }
+
+    function reiniciarTodo() {
+      if (confirm("¿Estás seguro de que deseas borrar TODO el historial?")) {
+        historial = {
+          colaborador1: [],
+          colaborador2: []
+        };
+        ultimaVenta = null;
+        localStorage.removeItem('historialVentas');
+        actualizarTotales();
+        actualizarTabla();
+      }
+    }
+
+    function exportarExcel() {
+      let csv = "Fecha 1,Colaborador 1,Folio 1,Fecha 2,Colaborador 2,Folio 2\n";
+      const ventas1 = historial.colaborador1;
+      const ventas2 = historial.colaborador2;
+      const maxLength = Math.max(ventas1.length, ventas2.length);
+
+      for (let i = 0; i < maxLength; i++) {
+        const v1 = ventas1[i] || {};
+        const v2 = ventas2[i] || {};
+        csv += `${v1.fecha || ''},${v1.monto ? "$" + v1.monto.toFixed(2) : ''},${v1.folio || ''},${v2.fecha || ''},${v2.monto ? "$" + v2.monto.toFixed(2) : ''},${v2.folio || ''}\n`;
+      }
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ventas_mes.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Inicial
+    actualizarTotales();
+    actualizarTabla();
+  </script>
+</body>
+</html>
