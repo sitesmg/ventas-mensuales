@@ -1,314 +1,181 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ventas del Mes</title>
+  <meta charset="UTF-8" />
+  <title>Ventas Oceania</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    h1 {
-      text-align: center;
-    }
-    .container {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    h1 { text-align: center; }
+    .container { display: flex; gap: 20px; }
     .colaborador {
-      flex: 1;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      flex: 1; background: white; padding: 20px;
+      border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    input[type="number"], input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      margin-bottom: 10px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .totales {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    .exportar {
-      margin-top: 30px;
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #007bff;
-      color: white;
-    }
-    .acciones-finales {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-      gap: 20px;
-    }
-    .acciones-finales button:nth-child(1) {
-      background-color: #f1c40f;
-    }
-    .acciones-finales button:nth-child(2) {
-      background-color: #e74c3c;
-    }
-    #graficaVentas {
-    max-width: 500px;
-    max-height: 400px;
-    margin: 0 auto;
-    display: block;
-    }
+    input { width: 100%; padding: 10px; margin-bottom: 10px; }
+    button { width: 100%; padding: 10px; font-size: 16px; color: white; border: none; cursor: pointer; }
+    .btn-enviar { background: #007bff; }
+    .btn-enviar:hover { background: #0056b3; }
+    .totales { margin-top: 10px; font-weight: bold; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #007bff; color: white; }
+    .acciones-finales { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
+    .acciones-finales button:nth-child(1) { background: #f1c40f; }
+    .acciones-finales button:nth-child(2) { background: #e74c3c; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <h1 id="titulo"></h1>
+<h1 id="titulo"></h1>
 
-  <div class="container">
-    <div class="colaborador">
-      <h3>Raúl</h3>
-      <input type="number" id="venta1" placeholder="Venta con IVA">
-      <input type="text" id="folio1" placeholder="Folio de sonic">
-      <button onclick="registrarVenta('colaborador1')">Enviar</button>
-      <div class="totales">Total acumulado: $<span id="total1">0.00</span></div>
-    </div>
-
-    <div class="colaborador">
-      <h3>Ixchel</h3>
-      <input type="number" id="venta2" placeholder="Venta con IVA">
-      <input type="text" id="folio2" placeholder="Folio de sonic">
-      <button onclick="registrarVenta('colaborador2')">Enviar</button>
-      <div class="totales">Total acumulado: $<span id="total2">0.00</span></div>
-    </div>
+<div class="container">
+  <div class="colaborador">
+    <h3>Colaborador 1</h3>
+    <input type="number" id="venta1" placeholder="Venta con IVA" />
+    <input type="text" id="folio1" placeholder="Folio de venta" />
+    <button class="btn-enviar" onclick="registrarVenta('colaborador1')">Enviar</button>
+    <div class="totales">Total acumulado: $<span id="total1">0.00</span></div>
   </div>
 
-  <div class="exportar">
-    <button onclick="exportarExcel()">Exportar a Excel</button>
+  <div class="colaborador">
+    <h3>Colaborador 2</h3>
+    <input type="number" id="venta2" placeholder="Venta con IVA" />
+    <input type="text" id="folio2" placeholder="Folio de venta" />
+    <button class="btn-enviar" onclick="registrarVenta('colaborador2')">Enviar</button>
+    <div class="totales">Total acumulado: $<span id="total2">0.00</span></div>
   </div>
+</div>
 
-  <table id="tablaVentas">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Raúl</th>
-        <th>Folio</th>
-        <th>Fecha</th>
-        <th>Ixchel</th>
-        <th>Folio</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th>Fecha 1</th><th>Colaborador 1</th><th>Folio 1</th>
+      <th>Fecha 2</th><th>Colaborador 2</th><th>Folio 2</th>
+    </tr>
+  </thead>
+  <tbody id="tablaVentas"></tbody>
+</table>
 
-  <div class="acciones-finales">
-    <button onclick="deshacerUltimo()">Deshacer último registro</button>
-    <button onclick="reiniciarTodo()">Reiniciar todo</button>
-  </div>
+<div class="acciones-finales">
+  <button onclick="deshacerUltimo()">Deshacer último registro</button>
+  <button onclick="reiniciarTodo()">Reiniciar todo</button>
+</div>
 
-  <div style="margin-top: 40px;">
-    <h3 style="text-align: center;">Progreso hacia la meta ($93,000)</h3>
-    <canvas id="graficaVentas"></canvas>
-  </div>
+<div style="text-align:center; margin-top:20px;">
+  <button onclick="exportarExcel()">Exportar a Excel</button>
+</div>
 
-  <script>
-    const titulo = document.getElementById('titulo');
-    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
-                   "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    const fecha = new Date();
-    titulo.textContent = `Ventas del mes ${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+<!-- FIREBASE SDK + APP + FIRESTORE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-    let historial = JSON.parse(localStorage.getItem('historialVentas')) || {
-      colaborador1: [],
-      colaborador2: []
-    };
-    let ultimaVenta = null;
-    let grafica;
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwzhWKkYZ7gmPkEfR6KEiGw20w2fRnivI",
+    authDomain: "ventas-oceania.firebaseapp.com",
+    projectId: "ventas-oceania",
+    storageBucket: "ventas-oceania.firebasestorage.app",
+    messagingSenderId: "478023352426",
+    appId: "1:478023352426:web:e572ab8b3e1b8370a10a13"
+  };
 
-    function registrarVenta(colaborador) {
-      const ventaInput = document.getElementById(colaborador === 'colaborador1' ? 'venta1' : 'venta2');
-      const folioInput = document.getElementById(colaborador === 'colaborador1' ? 'folio1' : 'folio2');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const ventasRef = collection(db, "ventas");
 
-      const ventaConIVA = parseFloat(ventaInput.value) || 0;
-      const ventaSinIVA = ventaConIVA / 1.16;
-      const folio = folioInput.value.trim() || "-";
-      const fechaActual = new Date().toISOString().split('T')[0];
+  const tablaVentas = document.getElementById("tablaVentas");
+  const titulo = document.getElementById("titulo");
+  const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio",
+                 "Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const fechaHoy = new Date();
+  titulo.textContent = `Ventas del mes ${meses[fechaHoy.getMonth()]} ${fechaHoy.getFullYear()}`;
 
-      historial[colaborador].push({
-        fecha: fechaActual,
-        monto: ventaSinIVA,
-        folio: folio
+  let historial = { colaborador1: [], colaborador2: [] };
+  let ultimaVentaId = null;
+
+  async function registrarVenta(colaborador) {
+    const monto = parseFloat(document.getElementById(`venta${colaborador === 'colaborador1' ? 1 : 2}`).value) || 0;
+    const folio = document.getElementById(`folio${colaborador === 'colaborador1' ? 1 : 2}`).value.trim() || "-";
+    const fecha = new Date().toISOString().split("T")[0];
+    const montoSinIVA = monto / 1.16;
+
+    const docRef = await addDoc(ventasRef, {
+      colaborador, folio, fecha, monto: montoSinIVA, timestamp: new Date()
+    });
+
+    ultimaVentaId = docRef.id;
+
+    document.getElementById(`venta${colaborador === 'colaborador1' ? 1 : 2}`).value = "";
+    document.getElementById(`folio${colaborador === 'colaborador1' ? 1 : 2}`).value = "";
+  }
+
+  function cargarVentas() {
+    const q = query(ventasRef, orderBy("timestamp"));
+    onSnapshot(q, (snapshot) => {
+      historial = { colaborador1: [], colaborador2: [] };
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        historial[data.colaborador].push({ ...data });
       });
-
-      ultimaVenta = { colaborador };
-
-      localStorage.setItem('historialVentas', JSON.stringify(historial));
-
-      ventaInput.value = '';
-      folioInput.value = '';
-
       actualizarTotales();
       actualizarTabla();
+    });
+  }
+
+  function actualizarTotales() {
+    const total1 = historial.colaborador1.reduce((s, v) => s + v.monto, 0);
+    const total2 = historial.colaborador2.reduce((s, v) => s + v.monto, 0);
+    document.getElementById("total1").textContent = total1.toFixed(2);
+    document.getElementById("total2").textContent = total2.toFixed(2);
+  }
+
+  function actualizarTabla() {
+    tablaVentas.innerHTML = "";
+    const len = Math.max(historial.colaborador1.length, historial.colaborador2.length);
+    for (let i = 0; i < len; i++) {
+      const c1 = historial.colaborador1[i];
+      const c2 = historial.colaborador2[i];
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${c1?.fecha || ""}</td><td>${c1 ? "$" + c1.monto.toFixed(2) : ""}</td><td>${c1?.folio || ""}</td>
+        <td>${c2?.fecha || ""}</td><td>${c2 ? "$" + c2.monto.toFixed(2) : ""}</td><td>${c2?.folio || ""}</td>
+      `;
+      tablaVentas.appendChild(row);
     }
+  }
 
-    function actualizarTotales() {
-      const total1 = historial.colaborador1.reduce((sum, v) => sum + v.monto, 0);
-      const total2 = historial.colaborador2.reduce((sum, v) => sum + v.monto, 0);
-
-      document.getElementById('total1').textContent = total1.toFixed(2);
-      document.getElementById('total2').textContent = total2.toFixed(2);
-
-      actualizarGrafica();
+  async function deshacerUltimo() {
+    if (!ultimaVentaId) {
+      alert("No hay registro reciente para deshacer.");
+      return;
     }
+    await deleteDoc(doc(db, "ventas", ultimaVentaId));
+    ultimaVentaId = null;
+  }
 
-    function actualizarTabla() {
-      const tbody = document.querySelector("#tablaVentas tbody");
-      tbody.innerHTML = "";
-
-      const ventas1 = historial.colaborador1;
-      const ventas2 = historial.colaborador2;
-      const maxLength = Math.max(ventas1.length, ventas2.length);
-
-      for (let i = 0; i < maxLength; i++) {
-        const v1 = ventas1[i];
-        const v2 = ventas2[i];
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${v1 ? v1.fecha : ''}</td>
-          <td>${v1 ? `$${v1.monto.toFixed(2)}` : ''}</td>
-          <td>${v1 ? v1.folio : ''}</td>
-          <td>${v2 ? v2.fecha : ''}</td>
-          <td>${v2 ? `$${v2.monto.toFixed(2)}` : ''}</td>
-          <td>${v2 ? v2.folio : ''}</td>
-        `;
-        tbody.appendChild(row);
-      }
+  async function reiniciarTodo() {
+    if (confirm("¿Deseas borrar todo el historial?")) {
+      const q = await getDocs(ventasRef);
+      q.forEach(async (docu) => await deleteDoc(doc(db, "ventas", docu.id)));
     }
+  }
 
-    function actualizarGrafica() {
-      const total1 = historial.colaborador1.reduce((sum, v) => sum + v.monto, 0);
-      const total2 = historial.colaborador2.reduce((sum, v) => sum + v.monto, 0);
-      const totalGeneral = total1 + total2;
-      const meta = 93000;
-      const restante = Math.max(meta - totalGeneral, 0);
-
-      const labels = restante > 0 ? ['Raúl', 'Ixchel', 'Restante'] : ['Raúl', 'Ixchel'];
-      const data = restante > 0 ? [total1, total2, restante] : [total1, total2];
-      const colores = restante > 0 ? ['#3498db', '#e67e22', '#bdc3c7'] : ['#3498db', '#e67e22'];
-
-      const ctx = document.getElementById('graficaVentas').getContext('2d');
-
-      if (grafica) {
-        grafica.data.labels = labels;
-        grafica.data.datasets[0].data = data;
-        grafica.data.datasets[0].backgroundColor = colores;
-        grafica.update();
-      } else {
-        grafica = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: labels,
-            datasets: [{
-              data: data,
-              backgroundColor: colores
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: 'bottom' },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    const raw = context.raw;
-                    const porcentaje = (raw / meta * 100).toFixed(2);
-                    return `${context.label}: $${raw.toFixed(2)} (${porcentaje}%)`;
-                  }
-                }
-              }
-            }
-          }
-        });
-      }
+  function exportarExcel() {
+    let csv = "Fecha 1,Monto 1,Folio 1,Fecha 2,Monto 2,Folio 2\n";
+    const l = Math.max(historial.colaborador1.length, historial.colaborador2.length);
+    for (let i = 0; i < l; i++) {
+      const c1 = historial.colaborador1[i] || {};
+      const c2 = historial.colaborador2[i] || {};
+      csv += `${c1.fecha || ""},${c1.monto?.toFixed(2) || ""},${c1.folio || ""},${c2.fecha || ""},${c2.monto?.toFixed(2) || ""},${c2.folio || ""}\n`;
     }
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "ventas_oceania.csv";
+    a.click();
+  }
 
-    function deshacerUltimo() {
-      if (!ultimaVenta) {
-        alert("No hay acción para deshacer.");
-        return;
-      }
-
-      const { colaborador } = ultimaVenta;
-      if (historial[colaborador].length > 0) {
-        historial[colaborador].pop();
-        ultimaVenta = null;
-        localStorage.setItem('historialVentas', JSON.stringify(historial));
-        actualizarTotales();
-        actualizarTabla();
-      }
-    }
-
-    function reiniciarTodo() {
-      if (confirm("¿Estás seguro de que deseas borrar TODO el historial?")) {
-        historial = {
-          colaborador1: [],
-          colaborador2: []
-        };
-        ultimaVenta = null;
-        localStorage.removeItem('historialVentas');
-        actualizarTotales();
-        actualizarTabla();
-      }
-    }
-
-    function exportarExcel() {
-      let csv = "Fecha 1,Colaborador 1,Folio 1,Fecha 2,Colaborador 2,Folio 2\n";
-      const ventas1 = historial.colaborador1;
-      const ventas2 = historial.colaborador2;
-      const maxLength = Math.max(ventas1.length, ventas2.length);
-
-      for (let i = 0; i < maxLength; i++) {
-        const v1 = ventas1[i] || {};
-        const v2 = ventas2[i] || {};
-        csv += `${v1.fecha || ''},${v1.monto ? "$" + v1.monto.toFixed(2) : ''},${v1.folio || ''},${v2.fecha || ''},${v2.monto ? "$" + v2.monto.toFixed(2) : ''},${v2.folio || ''}\n`;
-      }
-
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ventas_mes.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    // Inicial
-    actualizarTotales();
-    actualizarTabla();
-  </script>
+  cargarVentas();
+</script>
 </body>
 </html>
