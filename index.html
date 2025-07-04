@@ -1,181 +1,264 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <title>Ventas Oceania</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-    h1 { text-align: center; }
-    .container { display: flex; gap: 20px; }
-    .colaborador {
-      flex: 1; background: white; padding: 20px;
-      border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
     }
-    input { width: 100%; padding: 10px; margin-bottom: 10px; }
-    button { width: 100%; padding: 10px; font-size: 16px; color: white; border: none; cursor: pointer; }
-    .btn-enviar { background: #007bff; }
-    .btn-enviar:hover { background: #0056b3; }
-    .totales { margin-top: 10px; font-weight: bold; }
-    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    th { background: #007bff; color: white; }
-    .acciones-finales { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
-    .acciones-finales button:nth-child(1) { background: #f1c40f; }
-    .acciones-finales button:nth-child(2) { background: #e74c3c; }
+
+    h1 {
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .colaborador {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-enviar {
+      background: #007bff;
+    }
+
+    .btn-enviar:hover {
+      background: #0056b3;
+    }
+
+    .totales {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #007bff;
+      color: white;
+    }
+
+    .acciones-finales {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      gap: 20px;
+    }
+
+    .acciones-finales button:nth-child(1) {
+      background: #f1c40f;
+    }
+
+    .acciones-finales button:nth-child(2) {
+      background: #e74c3c;
+    }
+
   </style>
 </head>
+
 <body>
 
-<h1 id="titulo"></h1>
+  <h1 id="titulo"></h1>
 
-<div class="container">
-  <div class="colaborador">
-    <h3>Raúl</h3>
-    <input type="number" id="venta1" placeholder="Venta con IVA" />
-    <input type="text" id="folio1" placeholder="Folio de sonic" />
-    <button class="btn-enviar" onclick="registrarVenta('colaborador1')">Enviar</button>
-    <div class="totales">Total acumulado: $<span id="total1">0.00</span></div>
+  <div class="container">
+    <div class="colaborador">
+      <h3>Raúl</h3>
+      <input type="number" id="venta1" placeholder="Venta con IVA" />
+      <input type="text" id="folio1" placeholder="Folio de venta" />
+      <button class="btn-enviar" onclick="registrarVenta('colaborador1')">Enviar</button>
+      <div class="totales">Total acumulado: $<span id="total1">0.00</span></div>
+    </div>
+
+    <div class="colaborador">
+      <h3>Ixchel</h3>
+      <input type="number" id="venta2" placeholder="Venta con IVA" />
+      <input type="text" id="folio2" placeholder="Folio de venta" />
+      <button class="btn-enviar" onclick="registrarVenta('colaborador2')">Enviar</button>
+      <div class="totales">Total acumulado: $<span id="total2">0.00</span></div>
+    </div>
   </div>
 
-  <div class="colaborador">
-    <h3>Ixchel</h3>
-    <input type="number" id="venta2" placeholder="Venta con IVA" />
-    <input type="text" id="folio2" placeholder="Folio de sonic" />
-    <button class="btn-enviar" onclick="registrarVenta('colaborador2')">Enviar</button>
-    <div class="totales">Total acumulado: $<span id="total2">0.00</span></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Raúl</th>
+        <th>Folio</th>
+        <th>Fecha</th>
+        <th>Ixchel</th>
+        <th>Folio</th>
+      </tr>
+    </thead>
+    <tbody id="tablaVentas"></tbody>
+  </table>
+
+  <div class="acciones-finales">
+    <button onclick="deshacerUltimo()">Deshacer último registro</button>
+    <button onclick="reiniciarTodo()">Reiniciar todo</button>
   </div>
-</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Fecha</th><th>Raúl</th><th>Folio</th>
-      <th>Fecha</th><th>Ixchel</th><th>Folio</th>
-    </tr>
-  </thead>
-  <tbody id="tablaVentas"></tbody>
-</table>
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="exportarExcel()">Exportar a Excel</button>
+  </div>
 
-<div class="acciones-finales">
-  <button onclick="deshacerUltimo()">Deshacer último registro</button>
-  <button onclick="reiniciarTodo()">Reiniciar todo</button>
-</div>
+  <!-- FIREBASE + LÓGICA -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, onSnapshot,
+      deleteDoc, doc, query, orderBy
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-<div style="text-align:center; margin-top:20px;">
-  <button onclick="exportarExcel()">Exportar a Excel</button>
-</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwzhWKkYZ7gmPkEfR6KEiGw20w2fRnivI",
+      authDomain: "ventas-oceania.firebaseapp.com",
+      projectId: "ventas-oceania",
+      storageBucket: "ventas-oceania.firebasestorage.app",
+      messagingSenderId: "478023352426",
+      appId: "1:478023352426:web:e572ab8b3e1b8370a10a13"
+    };
 
-<!-- FIREBASE SDK + APP + FIRESTORE -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ventasRef = collection(db, "ventas");
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDwzhWKkYZ7gmPkEfR6KEiGw20w2fRnivI",
-    authDomain: "ventas-oceania.firebaseapp.com",
-    projectId: "ventas-oceania",
-    storageBucket: "ventas-oceania.firebasestorage.app",
-    messagingSenderId: "478023352426",
-    appId: "1:478023352426:web:e572ab8b3e1b8370a10a13"
-  };
+    const tablaVentas = document.getElementById("tablaVentas");
+    const titulo = document.getElementById("titulo");
+    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+      "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const fechaHoy = new Date();
+    titulo.textContent = `Ventas del mes ${meses[fechaHoy.getMonth()]} ${fechaHoy.getFullYear()}`;
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const ventasRef = collection(db, "ventas");
+    let historial = { colaborador1: [], colaborador2: [] };
+    let ultimaVentaId = null;
 
-  const tablaVentas = document.getElementById("tablaVentas");
-  const titulo = document.getElementById("titulo");
-  const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio",
-                 "Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const fechaHoy = new Date();
-  titulo.textContent = `Ventas del mes ${meses[fechaHoy.getMonth()]} ${fechaHoy.getFullYear()}`;
+    async function registrarVenta(colaborador) {
+      const idNum = colaborador === 'colaborador1' ? 1 : 2;
+      const monto = parseFloat(document.getElementById(`venta${idNum}`).value) || 0;
+      const folio = document.getElementById(`folio${idNum}`).value.trim() || "-";
+      const fecha = new Date().toISOString().split("T")[0];
+      const montoSinIVA = monto / 1.16;
 
-  let historial = { colaborador1: [], colaborador2: [] };
-  let ultimaVentaId = null;
-
-  async function registrarVenta(colaborador) {
-    const monto = parseFloat(document.getElementById(`venta${colaborador === 'colaborador1' ? 1 : 2}`).value) || 0;
-    const folio = document.getElementById(`folio${colaborador === 'colaborador1' ? 1 : 2}`).value.trim() || "-";
-    const fecha = new Date().toISOString().split("T")[0];
-    const montoSinIVA = monto / 1.16;
-
-    const docRef = await addDoc(ventasRef, {
-      colaborador, folio, fecha, monto: montoSinIVA, timestamp: new Date()
-    });
-
-    ultimaVentaId = docRef.id;
-
-    document.getElementById(`venta${colaborador === 'colaborador1' ? 1 : 2}`).value = "";
-    document.getElementById(`folio${colaborador === 'colaborador1' ? 1 : 2}`).value = "";
-  }
-
-  function cargarVentas() {
-    const q = query(ventasRef, orderBy("timestamp"));
-    onSnapshot(q, (snapshot) => {
-      historial = { colaborador1: [], colaborador2: [] };
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        historial[data.colaborador].push({ ...data });
+      const docRef = await addDoc(ventasRef, {
+        colaborador, folio, fecha, monto: montoSinIVA, timestamp: new Date()
       });
-      actualizarTotales();
-      actualizarTabla();
-    });
-  }
 
-  function actualizarTotales() {
-    const total1 = historial.colaborador1.reduce((s, v) => s + v.monto, 0);
-    const total2 = historial.colaborador2.reduce((s, v) => s + v.monto, 0);
-    document.getElementById("total1").textContent = total1.toFixed(2);
-    document.getElementById("total2").textContent = total2.toFixed(2);
-  }
+      ultimaVentaId = docRef.id;
 
-  function actualizarTabla() {
-    tablaVentas.innerHTML = "";
-    const len = Math.max(historial.colaborador1.length, historial.colaborador2.length);
-    for (let i = 0; i < len; i++) {
-      const c1 = historial.colaborador1[i];
-      const c2 = historial.colaborador2[i];
-      const row = document.createElement("tr");
-      row.innerHTML = `
+      document.getElementById(`venta${idNum}`).value = "";
+      document.getElementById(`folio${idNum}`).value = "";
+    }
+
+    function cargarVentas() {
+      const q = query(ventasRef, orderBy("timestamp"));
+      onSnapshot(q, (snapshot) => {
+        historial = { colaborador1: [], colaborador2: [] };
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          historial[data.colaborador].push({ ...data });
+        });
+        actualizarTotales();
+        actualizarTabla();
+      });
+    }
+
+    function actualizarTotales() {
+      const total1 = historial.colaborador1.reduce((s, v) => s + v.monto, 0);
+      const total2 = historial.colaborador2.reduce((s, v) => s + v.monto, 0);
+      document.getElementById("total1").textContent = total1.toFixed(2);
+      document.getElementById("total2").textContent = total2.toFixed(2);
+    }
+
+    function actualizarTabla() {
+      tablaVentas.innerHTML = "";
+      const len = Math.max(historial.colaborador1.length, historial.colaborador2.length);
+      for (let i = 0; i < len; i++) {
+        const c1 = historial.colaborador1[i];
+        const c2 = historial.colaborador2[i];
+        const row = document.createElement("tr");
+        row.innerHTML = `
         <td>${c1?.fecha || ""}</td><td>${c1 ? "$" + c1.monto.toFixed(2) : ""}</td><td>${c1?.folio || ""}</td>
         <td>${c2?.fecha || ""}</td><td>${c2 ? "$" + c2.monto.toFixed(2) : ""}</td><td>${c2?.folio || ""}</td>
       `;
-      tablaVentas.appendChild(row);
+        tablaVentas.appendChild(row);
+      }
     }
-  }
 
-  async function deshacerUltimo() {
-    if (!ultimaVentaId) {
-      alert("No hay registro reciente para deshacer.");
-      return;
+    async function deshacerUltimo() {
+      if (!ultimaVentaId) {
+        alert("No hay registro reciente para deshacer.");
+        return;
+      }
+      await deleteDoc(doc(db, "ventas", ultimaVentaId));
+      ultimaVentaId = null;
     }
-    await deleteDoc(doc(db, "ventas", ultimaVentaId));
-    ultimaVentaId = null;
-  }
 
-  async function reiniciarTodo() {
-    if (confirm("¿Deseas borrar todo el historial?")) {
-      const q = await getDocs(ventasRef);
-      q.forEach(async (docu) => await deleteDoc(doc(db, "ventas", docu.id)));
+    async function reiniciarTodo() {
+      if (confirm("¿Deseas borrar todo el historial?")) {
+        const q = await getDocs(ventasRef);
+        q.forEach(async (docu) => await deleteDoc(doc(db, "ventas", docu.id)));
+      }
     }
-  }
 
-  function exportarExcel() {
-    let csv = "Fecha 1,Monto 1,Folio 1,Fecha 2,Monto 2,Folio 2\n";
-    const l = Math.max(historial.colaborador1.length, historial.colaborador2.length);
-    for (let i = 0; i < l; i++) {
-      const c1 = historial.colaborador1[i] || {};
-      const c2 = historial.colaborador2[i] || {};
-      csv += `${c1.fecha || ""},${c1.monto?.toFixed(2) || ""},${c1.folio || ""},${c2.fecha || ""},${c2.monto?.toFixed(2) || ""},${c2.folio || ""}\n`;
+    function exportarExcel() {
+      let csv = "Fecha 1,Monto 1,Folio 1,Fecha 2,Monto 2,Folio 2\n";
+      const l = Math.max(historial.colaborador1.length, historial.colaborador2.length);
+      for (let i = 0; i < l; i++) {
+        const c1 = historial.colaborador1[i] || {};
+        const c2 = historial.colaborador2[i] || {};
+        csv += `${c1.fecha || ""},${c1.monto?.toFixed(2) || ""},${c1.folio || ""},${c2.fecha || ""},${c2.monto?.toFixed(2) || ""},${c2.folio || ""}\n`;
+      }
+      const blob = new Blob([csv], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "ventas_oceania.csv";
+      a.click();
     }
-    const blob = new Blob([csv], { type: "text/csv" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "ventas_oceania.csv";
-    a.click();
-  }
 
-  cargarVentas();
-</script>
+    // Exponer funciones al HTML
+    window.registrarVenta = registrarVenta;
+    window.deshacerUltimo = deshacerUltimo;
+    window.reiniciarTodo = reiniciarTodo;
+    window.exportarExcel = exportarExcel;
+
+    cargarVentas();
+  </script>
 </body>
+
 </html>
