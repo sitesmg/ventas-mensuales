@@ -35,7 +35,6 @@
     }
 
     button {
-      width: 100%;
       padding: 10px;
       font-size: 16px;
       color: white;
@@ -45,6 +44,7 @@
 
     .btn-enviar {
       background: #007bff;
+      width: 100%;
     }
 
     .btn-enviar:hover {
@@ -53,6 +53,31 @@
 
     .totales {
       margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .progress-container {
+      background: #ddd;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 10px;
+      height: 20px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #28a745;
+      color: white;
+      text-align: center;
+      line-height: 20px;
+      font-size: 14px;
+      transition: width 0.4s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 4px;
       font-weight: bold;
     }
 
@@ -74,6 +99,14 @@
       color: white;
     }
 
+    td button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: red;
+    }
+
     .acciones-finales {
       display: flex;
       justify-content: space-between;
@@ -83,17 +116,31 @@
 
     .acciones-finales button:nth-child(1) {
       background: #f1c40f;
+      width: 100%;
     }
 
     .acciones-finales button:nth-child(2) {
       background: #e74c3c;
+      width: 100%;
     }
 
+    .btn-exportar {
+      background-color: #6c9a7d;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-exportar:hover {
+      background-color: #5a836a;
+    }
   </style>
 </head>
 
 <body>
-
   <h1 id="titulo"></h1>
 
   <div class="container">
@@ -103,6 +150,10 @@
       <input type="text" id="folio1" placeholder="Folio de sonic" />
       <button class="btn-enviar" onclick="registrarVenta('colaborador1')">Enviar</button>
       <div class="totales">Total acumulado: $<span id="total1">0.00</span></div>
+      <div class="progress-container">
+        <div id="barra1" class="progress-bar" style="width: 0%">0%</div>
+      </div>
+      <div class="progress-text">Meta: $33,000</div>
     </div>
 
     <div class="colaborador">
@@ -111,6 +162,10 @@
       <input type="text" id="folio2" placeholder="Folio de sonic" />
       <button class="btn-enviar" onclick="registrarVenta('colaborador2')">Enviar</button>
       <div class="totales">Total acumulado: $<span id="total2">0.00</span></div>
+      <div class="progress-container">
+        <div id="barra2" class="progress-bar" style="width: 0%">0%</div>
+      </div>
+      <div class="progress-text">Meta: $60,000</div>
     </div>
   </div>
 
@@ -123,6 +178,7 @@
         <th>Fecha</th>
         <th>Ixchel</th>
         <th>Folio</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody id="tablaVentas"></tbody>
@@ -134,10 +190,9 @@
   </div>
 
   <div style="text-align:center; margin-top:20px;">
-    <button onclick="exportarExcel()">Exportar a Excel</button>
+    <button class="btn-exportar" onclick="exportarExcel()">Exportar a Excel</button>
   </div>
 
-  <!-- FIREBASE + LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import {
@@ -191,7 +246,7 @@
         historial = { colaborador1: [], colaborador2: [] };
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          historial[data.colaborador].push({ ...data });
+          historial[data.colaborador].push({ id: docSnap.id, ...data });
         });
         actualizarTotales();
         actualizarTabla();
@@ -203,6 +258,16 @@
       const total2 = historial.colaborador2.reduce((s, v) => s + v.monto, 0);
       document.getElementById("total1").textContent = total1.toFixed(2);
       document.getElementById("total2").textContent = total2.toFixed(2);
+
+      const porcentaje1 = Math.min((total1 / 33000) * 100, 100);
+      const barra1 = document.getElementById("barra1");
+      barra1.style.width = `${porcentaje1}%`;
+      barra1.textContent = `${porcentaje1.toFixed(0)}%`;
+
+      const porcentaje2 = Math.min((total2 / 60000) * 100, 100);
+      const barra2 = document.getElementById("barra2");
+      barra2.style.width = `${porcentaje2}%`;
+      barra2.textContent = `${porcentaje2.toFixed(0)}%`;
     }
 
     function actualizarTabla() {
@@ -213,10 +278,24 @@
         const c2 = historial.colaborador2[i];
         const row = document.createElement("tr");
         row.innerHTML = `
-        <td>${c1?.fecha || ""}</td><td>${c1 ? "$" + c1.monto.toFixed(2) : ""}</td><td>${c1?.folio || ""}</td>
-        <td>${c2?.fecha || ""}</td><td>${c2 ? "$" + c2.monto.toFixed(2) : ""}</td><td>${c2?.folio || ""}</td>
-      `;
+          <td>${c1?.fecha || ""}</td>
+          <td>${c1 ? "$" + c1.monto.toFixed(2) : ""}</td>
+          <td>${c1?.folio || ""}</td>
+          <td>${c2?.fecha || ""}</td>
+          <td>${c2 ? "$" + c2.monto.toFixed(2) : ""}</td>
+          <td>${c2?.folio || ""}</td>
+          <td>
+            ${c1?.id ? `<button onclick=\"eliminarVenta('${c1.id}')\">🗑️</button>` : ""}
+            ${c2?.id ? `<button onclick=\"eliminarVenta('${c2.id}')\">🗑️</button>` : ""}
+          </td>
+        `;
         tablaVentas.appendChild(row);
+      }
+    }
+
+    async function eliminarVenta(id) {
+      if (confirm("¿Deseas eliminar esta venta?")) {
+        await deleteDoc(doc(db, "ventas", id));
       }
     }
 
@@ -251,11 +330,11 @@
       a.click();
     }
 
-    // Exponer funciones al HTML
     window.registrarVenta = registrarVenta;
     window.deshacerUltimo = deshacerUltimo;
     window.reiniciarTodo = reiniciarTodo;
     window.exportarExcel = exportarExcel;
+    window.eliminarVenta = eliminarVenta;
 
     cargarVentas();
   </script>
