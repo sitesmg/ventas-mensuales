@@ -227,7 +227,11 @@
       const idNum = colaborador === 'colaborador1' ? 1 : 2;
       const monto = parseFloat(document.getElementById(`venta${idNum}`).value) || 0;
       const folio = document.getElementById(`folio${idNum}`).value.trim() || "-";
-      const fecha = new Date().toISOString().split("T")[0];
+      const now = new Date();
+      const fecha = now.getFullYear() + "-" +
+              String(now.getMonth() + 1).padStart(2, "0") + "-" +
+              String(now.getDate()).padStart(2, "0");
+
       const montoSinIVA = monto / 1.16;
 
       const docRef = await addDoc(ventasRef, {
